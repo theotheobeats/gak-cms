@@ -17,10 +17,13 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Card, CardContent, CardHeader } from "./ui/card";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const AuthForm = ({ type }: { type: string }) => {
 	const formSchema = authFormSchema(type);
 	const [isLoading, setIsLoading] = useState(false);
+	const router = useRouter();
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -33,33 +36,75 @@ const AuthForm = ({ type }: { type: string }) => {
 
 	async function onSubmit(data: z.infer<typeof formSchema>) {
 		setIsLoading(true);
-		try {
-			if (type === "/sign-in") {
-				// const result = await login(data);
-				// if (result) {
-				// 	toast.error("Invalid ID/Password");
-				// }
-			}
 
-			// TODO: Data unique handling
-			if (type === "/sign-up") {
-				// const result = await signup(data);
-				// console.log(result);
+		try {
+			const endpoint =
+				type === "/sign-in"
+					? "http://localhost:3001/api/auth/sign-in/email"
+					: "http://localhost:3001/api/auth/sign-up/email";
+
+			const response = await fetch(endpoint, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
+			});
+
+			const result = await response.json();
+
+			// Handle specific response statuses
+			switch (response.status) {
+				case 200:
+					toast.success(
+						type === "/sign-in"
+							? "Login successful!"
+							: "Account created successfully!"
+					);
+					router.push("/");
+					break;
+				case 400:
+					toast.error("Bad request. Please check your input and try again.");
+					break;
+				case 401:
+					toast.error("Unauthorized. Invalid email or password.");
+					break;
+				case 403:
+					toast.error("Forbidden. You don't have permission to access this.");
+					break;
+				case 404:
+					toast.error("Not found. The requested resource is unavailable.");
+					break;
+				case 429:
+					toast.error("Too many requests. Please wait and try again later.");
+					break;
+				case 500:
+					toast.error("Server error. Please try again later.");
+					break;
+				default:
+					toast.error(result.message || "An unexpected error occurred.");
+					break;
 			}
 		} catch (error) {
 			console.error(error);
+			toast.error("Network error. Please check your connection.");
 		} finally {
 			setIsLoading(false);
 		}
 	}
+	
 	return (
 		<div className="w-full max-w-xs mx-auto h-screen flex flex-col justify-center">
 			<Card className="mt-4">
 				<CardHeader>
 					{type === "/sign-in" ? (
-						<div className="font-bold text-2xl text-center">Login to GAK CMS</div>
+						<div className="font-bold text-2xl text-center">
+							Login to GAK CMS
+						</div>
 					) : (
-						<div className="font-bold text-2xl text-center">Sign Up for GAK CMS</div>
+						<div className="font-bold text-2xl text-center">
+							Sign Up for GAK CMS
+						</div>
 					)}
 				</CardHeader>
 				<CardContent>
