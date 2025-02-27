@@ -17,6 +17,7 @@ export const useSession = () => {
 
 				if (!res.ok) throw new Error("Failed to fetch session");
 
+				// this return only user data not session data.
 				const data = await res.json();
 				setSession(data?.user || null);
 			} catch (error) {
