@@ -1,48 +1,34 @@
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
-export function useSession(redirectOnAuth: boolean = false) {
-	const [isLoading, setIsLoading] = useState(true);
-	const [user, setUser] = useState(null);
-	const router = useRouter();
+export const useSession = () => {
+	const [session, setSession] = useState(null);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		const getSession = async () => {
+		const fetchSession = async () => {
 			try {
-				const response = await fetch(
-					"http://localhost:3001/api/auth/get-session",
-					{
-						method: "GET",
-						credentials: "include",
-						headers: { "Content-Type": "application/json" },
-					}
-				);
+				const res = await fetch("http://localhost:3001/api/auth/get-session", {
+					method: "GET",
+					credentials: "include", // ✅ Ensures cookies are sent
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
 
-				if (!response.ok) throw new Error("No active session");
+				if (!res.ok) throw new Error("Failed to fetch session");
 
-				const session = await response.json();
-				console.log(session);
-				setUser(session.user);
+				const data = await res.json();
+				setSession(data?.user || null);
 			} catch (error) {
-				console.error(error);
-				setUser(null);
+				console.error("Session fetch error:", error);
+				setSession(null);
 			} finally {
-				setIsLoading(false);
+				setLoading(false);
 			}
 		};
 
-		getSession();
+		fetchSession();
 	}, []);
 
-	useEffect(() => {
-		if (!isLoading) {
-			if (user && redirectOnAuth) {
-				router.push("/");
-			} else if (!user && !redirectOnAuth) {
-				router.push("/sign-in");
-			}
-		}
-	}, [user, isLoading, router, redirectOnAuth]);
-
-	return { user, isLoading };
-}
+	return { session, loading };
+};

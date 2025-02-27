@@ -1,11 +1,30 @@
 "use client";
 
-import { useSession } from "@/hooks/useSession";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "@/hooks/useSession"; // Import the session hook
+import Loading from "@/components/Loading";
 
 const Dashboard = () => {
-	const { isLoading } = useSession(false); // Redirect if not logged in
+	const { session, loading } = useSession();
+	const router = useRouter();
 
-	if (isLoading) return <p>Loading...</p>;
+	useEffect(() => {
+		if (!loading && !session) {
+			router.replace("/sign-in");
+		}
+	}, [session, loading, router]);
+
+	console.log(session);
+
+	if (loading)
+		return (
+			<div className="flex justify-center items-center h-screen">
+				<Loading />
+			</div>
+		);
+
+	if (!session) return null;
 
 	return (
 		<div>

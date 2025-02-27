@@ -49,6 +49,7 @@ const AuthForm = ({ type }: { type: string }) => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(data),
+				credentials: "include", // ✅ Ensures cookies are sent
 			});
 
 			const result = await response.json();
@@ -92,7 +93,7 @@ const AuthForm = ({ type }: { type: string }) => {
 			setIsLoading(false);
 		}
 	}
-	
+
 	return (
 		<div className="w-full max-w-xs mx-auto h-screen flex flex-col justify-center">
 			<Card className="mt-4">
