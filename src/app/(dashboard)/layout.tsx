@@ -3,7 +3,7 @@
 import Loading from "@/components/Loading";
 import Sidebar from "@/components/Sidebar";
 import { useSession } from "@/hooks/useSession";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import React, { useEffect } from "react";
 import { ReactNode } from "react";
 
@@ -14,12 +14,19 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
 	const { session, loading } = useSession();
 	const router = useRouter();
+	const pathname = usePathname(); // Get current path
 
 	useEffect(() => {
-		if (!loading && session) {
-			router.replace("/");
+		// Only redirect if we're not already on the home page and there's a session
+		if (
+			!loading &&
+			!session &&
+			pathname !== "/login" &&
+			pathname !== "/register"
+		) {
+			router.replace("/login");
 		}
-	}, [session, loading, router]);
+	}, [session, loading, router, pathname]);
 
 	if (loading)
 		return (

@@ -28,13 +28,13 @@ const Sidebar = () => {
 			<Link href="/devotion">
 				<div className="flex w-full hover:bg-slate-100 px-8 gap-4 py-4 transition-all">
 					<Book />
-					<div>Renungan</div>
+					<div>Devotion</div>
 				</div>
 			</Link>
 			<Link href="/devotion">
 				<div className="flex w-full hover:bg-slate-100 px-8 gap-4 py-4 transition-all">
 					<Camera />
-					<div>Dokumentasi</div>
+					<div>Documentation</div>
 				</div>
 			</Link>
 			<a onClick={logout}>
