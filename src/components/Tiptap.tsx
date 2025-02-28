@@ -13,7 +13,12 @@ import TextAlign from "@tiptap/extension-text-align";
 import { Sparkle } from "lucide-react";
 import { Button } from "./ui/button";
 
-const Tiptap = () => {
+interface TiptapProps {
+	onChange?: (content: string) => void;
+	initialContent?: string;
+}
+
+const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 	const editor = useEditor({
 		extensions: [
 			StarterKit.configure({
@@ -40,8 +45,11 @@ const Tiptap = () => {
 				types: ["heading", "paragraph"],
 			}),
 		],
-		content: "<p></p>",
+		content: initialContent,
 		autofocus: true,
+		onUpdate: ({ editor }) => {
+			onChange?.(editor.getHTML());
+		},
 	});
 
 	if (!editor) {
