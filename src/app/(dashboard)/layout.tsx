@@ -1,8 +1,7 @@
 "use client";
 
-import { DashboardSidebar } from "@/components/DashboardSidebar";
 import Loading from "@/components/Loading";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import Sidebar from "@/components/Sidebar";
 import { useSession } from "@/hooks/useSession";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
@@ -24,20 +23,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
 	if (loading)
 		return (
-			<div className="flex justify-center items-center h-screen">
+			<div className="flex justify-center items-center h-screen w-full">
 				<Loading />
 			</div>
 		);
 
 	return (
-		<div>
-			<SidebarProvider>
-				<DashboardSidebar />
-				<main>
-					<SidebarTrigger />
-					{children}
-				</main>
-			</SidebarProvider>
+		<div className="flex w-full h-screen">
+			<Sidebar />
+			{children}
 		</div>
 	);
 };

@@ -31,7 +31,7 @@ const Dashboard = () => {
 
 	if (loading)
 		return (
-			<div className="flex justify-center items-center h-screen">
+			<div className="flex justify-center items-center h-screen w-full mx-auto">
 				<Loading />
 			</div>
 		);
@@ -39,7 +39,7 @@ const Dashboard = () => {
 	if (!session) return null;
 
 	return (
-		<div className="m-8">
+		<div className="m-8 w-full h-screen">
 			<h1 className="font-bold text-2xl">Welcome, {session.name}</h1>
 		</div>
 	);
