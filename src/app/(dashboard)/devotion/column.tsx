@@ -1,8 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Send } from "lucide-react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Edit, Send, Trash2 } from "lucide-react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 
 // This type is used to define the shape of our data.
@@ -25,16 +27,11 @@ export const columns: ColumnDef<Devotion>[] = [
 		accessorKey: "status",
 		header: "Status",
 		cell: ({ row }) => {
-			const status = row.getValue("status");
+			const status = row.getValue("status") as string;
 			return (
-				<div
-					className={`px-2 py-1 rounded-full text-xs font-medium w-fit ${
-						status === "DRAFT"
-							? "bg-blue-100 text-blue-700"
-							: "bg-green-100 text-green-700"
-					}`}>
-					{status as string}
-				</div>
+				<Badge variant={status === "PUBLISHED" ? "default" : "secondary"}>
+					{status}
+				</Badge>
 			);
 		},
 	},
@@ -76,7 +73,7 @@ export const columns: ColumnDef<Devotion>[] = [
 			const handleDelete = async () => {
 				try {
 					const response = await fetch(
-						`http://localhost:3001/api/reflections/${devotion.id}`,
+						`http://localhost:3001/api/reflections/delete/${devotion.id}`,
 						{
 							method: "DELETE",
 							credentials: "include",
@@ -98,7 +95,7 @@ export const columns: ColumnDef<Devotion>[] = [
 			const handlePublish = async () => {
 				try {
 					const response = await fetch(
-						`http://localhost:3001/api/reflections/${devotion.id}/publish`,
+						`http://localhost:3001/api/reflections/publish/${devotion.id}`,
 						{
 							method: "PATCH",
 							credentials: "include",
@@ -119,13 +116,11 @@ export const columns: ColumnDef<Devotion>[] = [
 
 			return (
 				<div className="flex gap-2">
-					<button
-						className="text-blue-600 hover:text-blue-800"
-						onClick={() =>
-							(window.location.href = `/devotion/edit/${devotion.id}`)
-						}>
-						<Pencil className="h-4 w-4" />
-					</button>
+					<Button variant="ghost" size="icon" asChild>
+						<Link href={`/devotion/${devotion.id}/edit`}>
+							<Edit className="h-4 w-4" />
+						</Link>
+					</Button>
 					<button
 						className="text-red-600 hover:text-red-800"
 						onClick={handleDelete}>

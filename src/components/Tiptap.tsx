@@ -150,7 +150,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					title="Align Right">
 					Right
 				</button>
-				<Button type="button" className="text-right px-2">
+				<Button type="button" className="text-right px-2" disabled>
 					Generate with AI <Sparkle />
 				</Button>
 			</div>
