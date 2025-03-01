@@ -59,8 +59,9 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 	return (
 		<div className="border rounded-md p-4">
 			{/* Main Toolbar */}
-			<div className="flex flex-wrap gap-2 p-2 mb-8 border-b">
+			<div className="flex flex-wrap gap-2 p-2 border-b">
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().toggleBold().run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive("bold") ? "bg-gray-200" : ""
@@ -69,6 +70,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					B
 				</button>
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().toggleItalic().run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive("italic") ? "bg-gray-200" : ""
@@ -77,6 +79,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					I
 				</button>
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().toggleUnderline().run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive("underline") ? "bg-gray-200" : ""
@@ -85,6 +88,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					U
 				</button>
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().toggleStrike().run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive("strike") ? "bg-gray-200" : ""
@@ -93,6 +97,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					S
 				</button>
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().toggleBulletList().run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive("bulletList") ? "bg-gray-200" : ""
@@ -101,6 +106,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					• List
 				</button>
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().toggleOrderedList().run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive("orderedList") ? "bg-gray-200" : ""
@@ -109,6 +115,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					1. List
 				</button>
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().toggleBlockquote().run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive("blockquote") ? "bg-gray-200" : ""
@@ -117,6 +124,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					Quote
 				</button>
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().setTextAlign("left").run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive({ textAlign: "left" }) ? "bg-gray-200" : ""
@@ -125,6 +133,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					Left
 				</button>
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().setTextAlign("center").run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive({ textAlign: "center" }) ? "bg-gray-200" : ""
@@ -133,6 +142,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					Center
 				</button>
 				<button
+					type="button"
 					onClick={() => editor.chain().focus().setTextAlign("right").run()}
 					className={`px-2 py-1 rounded ${
 						editor.isActive({ textAlign: "right" }) ? "bg-gray-200" : ""
@@ -140,19 +150,20 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 					title="Align Right">
 					Right
 				</button>
-				<Button className="text-right px-2 py-4">
+				<Button type="button" className="text-right px-2">
 					Generate with AI <Sparkle />
 				</Button>
 			</div>
 
 			{/* Editor Content */}
-			<EditorContent editor={editor} className="min-h-64 p-2" />
+			<EditorContent editor={editor} className="min-h-64" />
 
 			{/* Bubble Menu for quick actions when text is selected */}
 			{editor && (
 				<BubbleMenu editor={editor} tippyOptions={{ duration: 100 }}>
 					<div className="flex gap-1 bg-white p-1 rounded shadow-lg border">
 						<button
+							type="button"
 							onClick={() => editor.chain().focus().toggleBold().run()}
 							className={`px-2 py-1 rounded text-sm ${
 								editor.isActive("bold") ? "bg-gray-200" : ""
@@ -160,6 +171,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 							B
 						</button>
 						<button
+							type="button"
 							onClick={() => editor.chain().focus().toggleItalic().run()}
 							className={`px-2 py-1 rounded text-sm ${
 								editor.isActive("italic") ? "bg-gray-200" : ""
@@ -167,6 +179,7 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 							I
 						</button>
 						<button
+							type="button"
 							onClick={() => editor.chain().focus().toggleUnderline().run()}
 							className={`px-2 py-1 rounded text-sm ${
 								editor.isActive("underline") ? "bg-gray-200" : ""

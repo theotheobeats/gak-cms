@@ -1,105 +1,46 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { DataTable } from "./data-table";
 import { columns, Devotion } from "./column";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import Loading from "@/components/Loading";
 
-async function getData(): Promise<Devotion[]> {
-	// Fetch data from your API here.
-    return [
-        {
-            id: "1",
-            status: "PUBLISHED",
-            title: "Morning Prayer",
-            publishedAt: "2023-10-01",
-            createdAt: "2023-10-01",
-            author: "Pdt. Daniel Ferry",
-        },
-        {
-            id: "2",
-            status: "PUBLISHED",
-            title: "Evening Reflection",
-            publishedAt: "2023-10-02",
-            createdAt: "2023-10-02",
-            author: "Pdt. Sarah Johnson",
-        },
-        {
-            id: "3",
-            status: "DRAFT",
-            title: "Sunday Sermon",
-            publishedAt: "2023-10-03",
-            createdAt: "2023-10-03",
-            author: "Pdt. Michael Lee",
-        },
-        {
-            id: "4",
-            status: "PUBLISHED",
-            title: "Weekly Devotion",
-            publishedAt: "2023-10-04",
-            createdAt: "2023-10-04",
-            author: "Pdt. Emily Davis",
-        },
-        {
-            id: "5",
-            status: "PUBLISHED",
-            title: "Daily Inspiration",
-            publishedAt: "2023-10-05",
-            createdAt: "2023-10-05",
-            author: "Pdt. John Smith",
-        },
-        {
-            id: "6",
-            status: "DRAFT",
-            title: "Faith and Hope",
-            publishedAt: "2023-10-06",
-            createdAt: "2023-10-06",
-            author: "Pdt. Anna Brown",
-        },
-        {
-            id: "7",
-            status: "PUBLISHED",
-            title: "Grace and Peace",
-            publishedAt: "2023-10-07",
-            createdAt: "2023-10-07",
-            author: "Pdt. David Wilson",
-        },
-        {
-            id: "8",
-            status: "PUBLISHED",
-            title: "Love and Kindness",
-            publishedAt: "2023-10-08",
-            createdAt: "2023-10-08",
-            author: "Pdt. Laura Martinez",
-        },
-        {
-            id: "9",
-            status: "DRAFT",
-            title: "Strength and Courage",
-            publishedAt: "2023-10-09",
-            createdAt: "2023-10-09",
-            author: "Pdt. James Anderson",
-        },
-        {
-            id: "10",
-            status: "PUBLISHED",
-            title: "Hope and Faith",
-            publishedAt: "2023-10-10",
-            createdAt: "2023-10-10",
-            author: "Pdt. Patricia Thomas",
-        },
-        {
-            id: "11",
-            status: "PUBLISHED",
-            title: "Joy and Peace",
-            publishedAt: "2023-10-11",
-            createdAt: "2023-10-11",
-            author: "Pdt. Robert Jackson",
-        },
-    ];
-}
+const Page = () => {
+	const [data, setData] = useState<Devotion[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 
-const page = async () => {
-	const data = await getData();
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const response = await fetch("http://localhost:3001/api/reflections/get", {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				});
+
+				if (!response.ok) {
+					throw new Error("Failed to fetch devotions");
+				}
+
+				const result = await response.json();
+				setData(result);
+				setError(null);
+			} catch (error) {
+				console.error("Error fetching devotions:", error);
+				setError("Failed to load devotions. Please try again later.");
+				setData([]);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchData();
+	}, []); // Empty dependency array means this effect runs once on mount
 
 	return (
 		<div className="p-8 w-full h-screen flex flex-col gap-8">
@@ -110,9 +51,19 @@ const page = async () => {
 				</Button>
 			</div>
 
-			<DataTable columns={columns} data={data} />
+			{isLoading ? (
+				<div className="flex items-center justify-center w-full h-32">
+					<Loading />
+				</div>
+			) : error ? (
+				<div className="w-full p-4 text-red-500 bg-red-100 rounded-md">
+					{error}
+				</div>
+			) : (
+				<DataTable columns={columns} data={data} />
+			)}
 		</div>
 	);
 };
 
-export default page;
+export default Page;

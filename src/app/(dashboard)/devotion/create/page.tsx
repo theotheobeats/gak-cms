@@ -55,7 +55,7 @@ export default function CreateDevotion() {
 						title,
 						content,
 						status,
-						publishedAt: date.toISOString(),
+						publishDate: date,
 					}),
 				}
 			);
@@ -117,6 +117,7 @@ export default function CreateDevotion() {
 							</SelectContent>
 						</Select>
 					</div>
+					{/* FIX: Publish Date is not retrieved on backend */}
 					<div className="space-y-2">
 						<label className="text-sm font-medium">Publish Date</label>
 						<Popover>
