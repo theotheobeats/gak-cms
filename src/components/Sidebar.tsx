@@ -31,7 +31,7 @@ const Sidebar = () => {
 					<div>Devotion</div>
 				</div>
 			</Link>
-			<Link href="/devotion">
+			<Link href="/documentation">
 				<div className="flex w-full hover:bg-slate-100 px-8 gap-4 py-4 transition-all">
 					<Camera />
 					<div>Documentation</div>
