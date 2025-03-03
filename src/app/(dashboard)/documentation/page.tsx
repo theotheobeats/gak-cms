@@ -4,47 +4,58 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 import DocumentationCard from "@/components/DocumentationCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { toast } from "react-hot-toast";
 
 interface Album {
 	id: string;
-	title: string;
-	coverImage?: string;
-	documentCount: number;
-	updatedAt: string;
+	name: string;
+	description: string;
+	date: string;
+	images: {
+		id: string;
+		url: string;
+		alt?: string;
+		caption?: string;
+		width?: number;
+		height?: number;
+		size: number;
+	}[];
 }
 
 const ITEMS_PER_PAGE = 6;
 
-const sampleAlbums: Album[] = [
-	{
-		id: "1",
-		title: "Company Policies",
-		documentCount: 15,
-		updatedAt: "2024-03-10T10:00:00Z",
-	},
-	{
-		id: "2",
-		title: "Employee Handbook",
-		documentCount: 8,
-		updatedAt: "2024-03-09T15:30:00Z",
-	},
-	{
-		id: "3",
-		title: "Project Guidelines",
-		documentCount: 12,
-		updatedAt: "2024-03-08T09:15:00Z",
-	},
-];
-
 export default function DocumentationPage() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [currentPage, setCurrentPage] = useState(1);
-	const [albums, setAlbums] = useState<Album[]>(sampleAlbums);
+	const [albums, setAlbums] = useState<Album[]>([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		fetchAlbums();
+	}, []);
+
+	const fetchAlbums = async () => {
+		try {
+			const response = await fetch("http://localhost:3001/api/albums", {
+				credentials: "include",
+			});
+			if (!response.ok) {
+				throw new Error("Failed to fetch albums");
+			}
+			const data = await response.json();
+			setAlbums(data);
+		} catch (error) {
+			console.error("Error fetching albums:", error);
+			toast.error("Failed to load albums");
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
 	const filteredAlbums = albums.filter((album) =>
-		album.title.toLowerCase().includes(searchQuery.toLowerCase())
+		album.name.toLowerCase().includes(searchQuery.toLowerCase())
 	);
 
 	const totalPages = Math.ceil(filteredAlbums.length / ITEMS_PER_PAGE);
@@ -58,13 +69,27 @@ export default function DocumentationPage() {
 		setCurrentPage(page);
 	};
 
-	const handleDelete = (id: string) => {
-		setAlbums(albums.filter((album) => album.id !== id));
+	const handleDelete = async (id: string) => {
+		try {
+			const response = await fetch(`http://localhost:3001/api/albums/${id}`, {
+				method: "DELETE",
+				credentials: "include",
+			});
+
+			if (!response.ok) {
+				throw new Error("Failed to delete album");
+			}
+
+			setAlbums(albums.filter((album) => album.id !== id));
+			toast.success("Album deleted successfully");
+		} catch (error) {
+			console.error("Error deleting album:", error);
+			toast.error("Failed to delete album");
+		}
 	};
 
 	return (
 		<div className="p-8 w-full min-h-screen">
-			{/* Header Section */}
 			<div className="mx-auto">
 				<div className="flex flex-col gap-8">
 					{/* Title and Upload Button */}
@@ -94,60 +119,88 @@ export default function DocumentationPage() {
 							value={searchQuery}
 							onChange={(e) => {
 								setSearchQuery(e.target.value);
-								setCurrentPage(1); // Reset to first page on search
+								setCurrentPage(1);
 							}}
 						/>
 					</div>
 
-					{/* Albums Grid */}
-					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-						{paginatedAlbums.map((album) => (
-							<DocumentationCard
-								key={album.id}
-								{...album}
-								onDelete={handleDelete}
-							/>
-						))}
-					</div>
-
-					{/* Empty State */}
-					{filteredAlbums.length === 0 && (
-						<div className="text-center py-12">
-							<p className="text-gray-500">No documentation albums found</p>
+					{/* Loading State */}
+					{isLoading ? (
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							{[...Array(6)].map((_, i) => (
+								<div
+									key={i}
+									className="bg-gray-100 rounded-lg h-64 animate-pulse"
+								/>
+							))}
 						</div>
-					)}
-
-					{/* Pagination */}
-					{filteredAlbums.length > 0 && (
-						<div className="flex items-center justify-center gap-2 mt-8">
-							<Button
-								variant="outline"
-								size="icon"
-								onClick={() => handlePageChange(currentPage - 1)}
-								disabled={currentPage === 1}>
-								<ChevronLeft className="h-4 w-4" />
-							</Button>
-							<div className="flex items-center gap-1">
-								{Array.from({ length: totalPages }, (_, i) => i + 1).map(
-									(page) => (
-										<Button
-											key={page}
-											variant={currentPage === page ? "default" : "outline"}
-											size="sm"
-											onClick={() => handlePageChange(page)}>
-											{page}
-										</Button>
-									)
-								)}
+					) : (
+						<>
+							{/* Albums Grid */}
+							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+								{paginatedAlbums.map((album) => (
+									<DocumentationCard
+										key={album.id}
+										id={album.id}
+										title={album.name}
+										coverImage={album.images[0]?.url}
+										documentCount={album.images.length}
+										updatedAt={album.date}
+										onDelete={handleDelete}
+									/>
+								))}
 							</div>
-							<Button
-								variant="outline"
-								size="icon"
-								onClick={() => handlePageChange(currentPage + 1)}
-								disabled={currentPage === totalPages}>
-								<ChevronRight className="h-4 w-4" />
-							</Button>
-						</div>
+
+							{/* Empty State */}
+							{filteredAlbums.length === 0 && (
+								<div className="text-center py-12">
+									<p className="text-gray-500">
+										No documentation albums found
+									</p>
+								</div>
+							)}
+
+							{/* Pagination */}
+							{filteredAlbums.length > 0 && (
+								<div className="flex items-center justify-center gap-2 mt-8">
+									<Button
+										variant="outline"
+										size="icon"
+										onClick={() => handlePageChange(currentPage - 1)}
+										disabled={currentPage === 1}
+									>
+										<ChevronLeft className="h-4 w-4" />
+									</Button>
+									<div className="flex items-center gap-1">
+										{Array.from(
+											{ length: totalPages },
+											(_, i) => i + 1
+										).map((page) => (
+											<Button
+												key={page}
+												variant={
+													currentPage === page
+														? "default"
+														: "outline"
+												}
+												size="sm"
+												onClick={() => handlePageChange(page)}
+											>
+												{page}
+											</Button>
+										))}
+									</div>
+									<Button
+										variant="outline"
+										size="icon"
+										onClick={() => handlePageChange(currentPage + 1)}
+										disabled={currentPage === totalPages}
+									>
+										<ChevronRight className="h-4 w-4" />
+									</Button>
+								</div>
+							)}
+						</>
 					)}
 				</div>
 			</div>

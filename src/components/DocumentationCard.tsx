@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
-import { FileText, Trash2, MoreVertical } from "lucide-react";
+import { FileText, Trash2, MoreVertical, Edit } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "./ui/button";
@@ -43,7 +43,7 @@ export default function DocumentationCard({
 
     return (
         <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow relative">
-            <Link href={`/documentation/${id}`} className="block">
+            <Link href={`/documentation/${id}/edit`} className="block">
                 <div className="aspect-[4/3] bg-gray-100 relative">
                     {coverImage ? (
                         <Image
@@ -61,20 +61,26 @@ export default function DocumentationCard({
                 <div className="p-4">
                     <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">{title}</h3>
                     <p className="text-gray-500 text-sm mt-2">
-                        {documentCount} documents • Updated {formatDistanceToNow(new Date(updatedAt))} ago
+                        {documentCount} {documentCount === 1 ? 'image' : 'images'} • Updated {formatDistanceToNow(new Date(updatedAt))} ago
                     </p>
                 </div>
             </Link>
 
             {/* Actions Menu */}
-            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-2 right-2">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 bg-white/80 hover:bg-white">
                             <MoreVertical className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                            <Link href={`/documentation/${id}/edit`} className="flex items-center">
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit
+                            </Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                             className="text-red-600 focus:text-red-600"
                             onClick={(e) => {
