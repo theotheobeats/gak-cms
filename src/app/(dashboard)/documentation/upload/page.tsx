@@ -1,5 +1,6 @@
 "use client";
 
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -25,15 +26,56 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-interface FileItem {
+// Zod schema to match backend validation
+const imageMetadataSchema = z.object({
+	id: z.string(),
+	alt: z.string().optional(),
+	caption: z.string().optional(),
+	width: z.number().optional(),
+	height: z.number().optional(),
+	size: z.number(),
+});
+
+const createAlbumSchema = z.object({
+	name: z.string().min(1, "Album name is required"),
+	description: z.string(),
+	date: z.string().datetime(),
+	images: z.array(imageMetadataSchema),
+});
+
+type CreateAlbumSchema = z.infer<typeof createAlbumSchema>;
+
+interface ImageMetadata {
+	id: string; // Local ID for frontend management
 	file: File;
-	id: string;
+	alt?: string;
+	caption?: string;
+	width?: number;
+	height?: number;
 }
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/gif"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-function SortableFileItem({ fileItem, onRemove }: { fileItem: FileItem; onRemove: (id: string) => void }) {
+function formatFileSize(bytes: number): string {
+	if (bytes === 0) return '0 Bytes';
+	const k = 1024;
+	const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+	const i = Math.floor(Math.log(bytes) / Math.log(k));
+	return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+async function getImageDimensions(file: File): Promise<{ width: number; height: number }> {
+	return new Promise((resolve) => {
+		const img = new Image();
+		img.onload = () => {
+			resolve({ width: img.width, height: img.height });
+		};
+		img.src = URL.createObjectURL(file);
+	});
+}
+
+function SortableFileItem({ fileItem, onRemove }: { fileItem: ImageMetadata; onRemove: (id: string) => void }) {
 	const {
 		attributes,
 		listeners,
@@ -59,9 +101,14 @@ function SortableFileItem({ fileItem, onRemove }: { fileItem: FileItem; onRemove
 				<GripVertical className="h-4 w-4 text-gray-400" />
 			</div>
 			<FileText className="h-4 w-4 text-gray-400" />
-			<span className="flex-1 text-sm text-gray-700 truncate">
-				{fileItem.file.name}
-			</span>
+			<div className="flex-1 min-w-0">
+				<p className="text-sm text-gray-700 truncate">
+					{fileItem.file.name}
+				</p>
+				<p className="text-xs text-gray-500">
+					{formatFileSize(fileItem.file.size)} • {fileItem.width}x{fileItem.height}
+				</p>
+			</div>
 			<button
 				type="button"
 				onClick={() => onRemove(fileItem.id)}
@@ -74,9 +121,9 @@ function SortableFileItem({ fileItem, onRemove }: { fileItem: FileItem; onRemove
 
 export default function UploadDocumentationPage() {
 	const router = useRouter();
-	const [title, setTitle] = useState("");
+	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
-	const [files, setFiles] = useState<FileItem[]>([]);
+	const [files, setFiles] = useState<ImageMetadata[]>([]);
 	const [isUploading, setIsUploading] = useState(false);
 	const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -99,12 +146,19 @@ export default function UploadDocumentationPage() {
 		return true;
 	};
 
-	const onDrop = useCallback((acceptedFiles: File[]) => {
+	const onDrop = useCallback(async (acceptedFiles: File[]) => {
 		const validFiles = acceptedFiles.filter(validateFile);
-		const newFiles = validFiles.map(file => ({
-			file,
-			id: Math.random().toString(36).substr(2, 9)
-		}));
+		const newFilesPromises = validFiles.map(async (file) => {
+			const dimensions = await getImageDimensions(file);
+			return {
+				file,
+				id: Math.random().toString(36).substr(2, 9),
+				size: file.size,
+				...dimensions,
+			};
+		});
+
+		const newFiles = await Promise.all(newFilesPromises);
 		setFiles(prev => [...prev, ...newFiles]);
 	}, []);
 
@@ -135,21 +189,35 @@ export default function UploadDocumentationPage() {
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (files.length === 0) {
-			toast.error("Please upload at least one image");
-			return;
-		}
-
-		setIsUploading(true);
-		setUploadProgress(0);
 
 		try {
+			// Validate the data using Zod schema
+			const albumData: CreateAlbumSchema = {
+				name: name.trim(),
+				description: description.trim(),
+				date: new Date().toISOString(),
+				images: files.map(({ file, id, alt, caption, width, height }) => ({
+					id,
+					alt: alt || file.name, // Use filename as alt if not provided
+					caption,
+					width,
+					height,
+					size: file.size,
+				})),
+			};
+
+			// Validate with Zod schema
+			createAlbumSchema.parse(albumData);
+
+			setIsUploading(true);
+			setUploadProgress(0);
+
 			const formData = new FormData();
-			formData.append("title", title);
-			formData.append("description", description);
+			formData.append("albumData", JSON.stringify(albumData));
 			
-			files.forEach((fileItem) => {
-				formData.append(`images`, fileItem.file);
+			// Append image files separately with sequential indices
+			files.forEach((fileItem, index) => {
+				formData.append(`image_${index}`, fileItem.file);
 			});
 
 			const xhr = new XMLHttpRequest();
@@ -164,10 +232,11 @@ export default function UploadDocumentationPage() {
 				xhr.open("POST", "http://localhost:3001/api/albums/create", true);
 				xhr.withCredentials = true;
 				xhr.onload = () => {
-					if (xhr.status === 200) {
+					if (xhr.status === 201) {
 						resolve(xhr.response);
 					} else {
-						reject(new Error("Failed to create album"));
+						const response = JSON.parse(xhr.response);
+						reject(new Error(response.error || "Failed to create album"));
 					}
 				};
 				xhr.onerror = () => reject(new Error("Network error"));
@@ -178,7 +247,13 @@ export default function UploadDocumentationPage() {
 			router.push("/documentation");
 		} catch (error) {
 			console.error("Error creating album:", error);
-			toast.error("Failed to create album");
+			if (error instanceof z.ZodError) {
+				error.errors.forEach((err) => {
+					toast.error(`Validation error: ${err.message}`);
+				});
+			} else {
+				toast.error(error instanceof Error ? error.message : "Failed to create album");
+			}
 		} finally {
 			setIsUploading(false);
 			setUploadProgress(0);
@@ -200,15 +275,17 @@ export default function UploadDocumentationPage() {
 
 					<form onSubmit={handleSubmit} className="space-y-6">
 						<div className="space-y-2">
-							<label htmlFor="title" className="text-sm font-medium">
-								Title
+							<label htmlFor="name" className="text-sm font-medium flex items-center gap-1">
+								Album Name
+								<span className="text-red-500">*</span>
 							</label>
 							<Input
-								id="title"
-								placeholder="Enter album title"
-								value={title}
-								onChange={(e) => setTitle(e.target.value)}
+								id="name"
+								placeholder="Enter album name"
+								value={name}
+								onChange={(e) => setName(e.target.value)}
 								required
+								className={!name.trim() ? "border-red-300 focus:border-red-500" : ""}
 							/>
 						</div>
 
@@ -225,7 +302,15 @@ export default function UploadDocumentationPage() {
 						</div>
 
 						<div className="space-y-2">
-							<label className="text-sm font-medium">Images</label>
+							<div className="flex justify-between items-center">
+								<label className="text-sm font-medium flex items-center gap-1">
+									Images
+									<span className="text-red-500">*</span>
+								</label>
+								<span className="text-sm text-gray-500">
+									{files.length} {files.length === 1 ? 'image' : 'images'} selected
+								</span>
+							</div>
 							<DndContext
 								sensors={sensors}
 								collisionDetection={closestCenter}
