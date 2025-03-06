@@ -229,7 +229,7 @@ export default function UploadDocumentationPage() {
 			});
 
 			await new Promise((resolve, reject) => {
-				xhr.open("POST", "http://localhost:3001/api/albums/create", true);
+				xhr.open("POST", `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums/create`, true);
 				xhr.withCredentials = true;
 				xhr.onload = () => {
 					if (xhr.status === 201) {

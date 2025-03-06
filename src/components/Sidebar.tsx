@@ -7,7 +7,7 @@ const Sidebar = () => {
 	const router = useRouter();
 	const logout = async () => {
 		try {
-			await fetch("http://localhost:3001/api/auth/sign-out", {
+			await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/sign-out`, {
 				method: "POST",
 				credentials: "include",
 				headers: { "Content-Type": "application/json" },

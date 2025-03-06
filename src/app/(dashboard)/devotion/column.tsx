@@ -73,7 +73,7 @@ export const columns: ColumnDef<Devotion>[] = [
 			const handleDelete = async () => {
 				try {
 					const response = await fetch(
-						`http://localhost:3001/api/reflections/delete/${devotion.id}`,
+						`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reflections/delete/${devotion.id}`,
 						{
 							method: "DELETE",
 							credentials: "include",
@@ -95,7 +95,7 @@ export const columns: ColumnDef<Devotion>[] = [
 			const handlePublish = async () => {
 				try {
 					const response = await fetch(
-						`http://localhost:3001/api/reflections/publish/${devotion.id}`,
+						`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reflections/publish/${devotion.id}`,
 						{
 							method: "PATCH",
 							credentials: "include",

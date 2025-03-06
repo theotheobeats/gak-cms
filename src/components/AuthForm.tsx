@@ -40,8 +40,8 @@ const AuthForm = ({ type }: { type: string }) => {
 		try {
 			const endpoint =
 				type === "/sign-in"
-					? "http://localhost:3001/api/auth/sign-in/email"
-					: "http://localhost:3001/api/auth/sign-up/email";
+					? `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/sign-in/email`
+					: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/sign-up/email`;
 
 			const response = await fetch(endpoint, {
 				method: "POST",

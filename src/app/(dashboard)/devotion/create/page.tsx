@@ -44,7 +44,7 @@ export default function CreateDevotion() {
 
 		try {
 			const response = await fetch(
-				"http://localhost:3001/api/reflections/create",
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reflections/create`,
 				{
 					method: "POST",
 					headers: {

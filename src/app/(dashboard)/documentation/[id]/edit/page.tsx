@@ -146,7 +146,7 @@ export default function EditDocumentationPage({
 
 	const fetchAlbum = async () => {
 		try {
-			const response = await fetch(`http://localhost:3001/api/albums/${id}`, {
+			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums/${id}`, {
 				credentials: "include",
 			});
 			if (!response.ok) {
@@ -209,7 +209,7 @@ export default function EditDocumentationPage({
 	const removeImage = async (id: string) => {
 		try {
 			setDeletingImageId(id);
-			const response = await fetch(`http://localhost:3001/api/albums/${album?.id}/images/${id}`, {
+			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums/${album?.id}/images/${id}`, {
 				method: 'DELETE',
 				credentials: 'include',
 			});
@@ -297,7 +297,7 @@ export default function EditDocumentationPage({
 			});
 
 			const response: Album = await new Promise((resolve, reject) => {
-				xhr.open("PUT", `http://localhost:3001/api/albums/${id}`, true);
+				xhr.open("PUT", `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums/${id}`, true);
 				xhr.withCredentials = true;
 				xhr.onload = () => {
 					try {

@@ -52,7 +52,7 @@ export default function EditDevotion({
 		const fetchDevotion = async () => {
 			try {
 				const response = await fetch(
-					`http://localhost:3001/api/reflections/get/${resolvedParams.id}`,
+					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reflections/get/${resolvedParams.id}`,
 					{
 						method: "GET",
 						headers: {
@@ -95,7 +95,7 @@ export default function EditDevotion({
 
 		try {
 			const response = await fetch(
-				`http://localhost:3001/api/reflections/update/${resolvedParams.id}`,
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reflections/update/${resolvedParams.id}`,
 				{
 					method: "PUT",
 					headers: {

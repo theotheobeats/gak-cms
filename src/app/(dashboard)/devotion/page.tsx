@@ -15,7 +15,7 @@ const Page = () => {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const response = await fetch("http://localhost:3001/api/reflections/get", {
+				const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/reflections/get`, {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",

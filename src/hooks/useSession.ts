@@ -7,7 +7,7 @@ export const useSession = () => {
 	useEffect(() => {
 		const fetchSession = async () => {
 			try {
-				const res = await fetch("http://localhost:3001/api/auth/get-session", {
+				const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/get-session`, {
 					method: "GET",
 					credentials: "include", // ✅ Ensures cookies are sent
 					headers: {

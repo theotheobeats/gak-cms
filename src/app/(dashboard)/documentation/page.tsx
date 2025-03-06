@@ -71,8 +71,8 @@ export default function DocumentationPage() {
 
 	const handleDelete = async (id: string) => {
 		try {
-			const response = await fetch(`http://localhost:3001/api/albums/${id}`, {
-				method: "DELETE",
+			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums/${id}`, {
+				method: "DELETE", 
 				credentials: "include",
 			});
 
