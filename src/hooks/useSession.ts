@@ -9,17 +9,29 @@ export const useSession = () => {
 			try {
 				const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/get-session`, {
 					method: "GET",
-					credentials: "include", // ✅ Ensures cookies are sent
+					credentials: "include",
 					headers: {
 						"Content-Type": "application/json",
 					},
 				});
 
-				if (!res.ok) throw new Error("Failed to fetch session");
+				if (!res.ok) {
+					throw new Error(`Failed to fetch session: ${res.status}`);
+				}
 
-				// this return only user data not session data.
-				const data = await res.json();
-				setSession(data?.user || null);
+				const text = await res.text();
+				if (!text) {
+					setSession(null);
+					return;
+				}
+
+				try {
+					const data = JSON.parse(text);
+					setSession(data?.user || null);
+				} catch (parseError) {
+					console.error("Failed to parse session response:", parseError);
+					setSession(null);
+				}
 			} catch (error) {
 				console.error("Session fetch error:", error);
 				setSession(null);
