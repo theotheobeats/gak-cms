@@ -38,9 +38,12 @@ export default function DocumentationPage() {
 
 	const fetchAlbums = async () => {
 		try {
-			const response = await fetch("http://localhost:3001/api/albums", {
-				credentials: "include",
-			});
+			const response = await fetch(
+				"${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums",
+				{
+					credentials: "include",
+				}
+			);
 			if (!response.ok) {
 				throw new Error("Failed to fetch albums");
 			}
@@ -71,10 +74,13 @@ export default function DocumentationPage() {
 
 	const handleDelete = async (id: string) => {
 		try {
-			const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums/${id}`, {
-				method: "DELETE", 
-				credentials: "include",
-			});
+			const response = await fetch(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums/${id}`,
+				{
+					method: "DELETE",
+					credentials: "include",
+				}
+			);
 
 			if (!response.ok) {
 				throw new Error("Failed to delete album");
@@ -154,9 +160,7 @@ export default function DocumentationPage() {
 							{/* Empty State */}
 							{filteredAlbums.length === 0 && (
 								<div className="text-center py-12">
-									<p className="text-gray-500">
-										No documentation albums found
-									</p>
+									<p className="text-gray-500">No documentation albums found</p>
 								</div>
 							)}
 
@@ -167,35 +171,27 @@ export default function DocumentationPage() {
 										variant="outline"
 										size="icon"
 										onClick={() => handlePageChange(currentPage - 1)}
-										disabled={currentPage === 1}
-									>
+										disabled={currentPage === 1}>
 										<ChevronLeft className="h-4 w-4" />
 									</Button>
 									<div className="flex items-center gap-1">
-										{Array.from(
-											{ length: totalPages },
-											(_, i) => i + 1
-										).map((page) => (
-											<Button
-												key={page}
-												variant={
-													currentPage === page
-														? "default"
-														: "outline"
-												}
-												size="sm"
-												onClick={() => handlePageChange(page)}
-											>
-												{page}
-											</Button>
-										))}
+										{Array.from({ length: totalPages }, (_, i) => i + 1).map(
+											(page) => (
+												<Button
+													key={page}
+													variant={currentPage === page ? "default" : "outline"}
+													size="sm"
+													onClick={() => handlePageChange(page)}>
+													{page}
+												</Button>
+											)
+										)}
 									</div>
 									<Button
 										variant="outline"
 										size="icon"
 										onClick={() => handlePageChange(currentPage + 1)}
-										disabled={currentPage === totalPages}
-									>
+										disabled={currentPage === totalPages}>
 										<ChevronRight className="h-4 w-4" />
 									</Button>
 								</div>
