@@ -163,7 +163,7 @@ export default function EditDevotion({
 					<label htmlFor="content" className="text-sm font-medium">
 						Content
 					</label>
-					<Tiptap onChange={setContent} initialContent={content} />
+					<Tiptap onChange={setContent} content={content} />
 				</div>
 				<div className="grid grid-cols-2 gap-4">
 					<div className="space-y-2">
