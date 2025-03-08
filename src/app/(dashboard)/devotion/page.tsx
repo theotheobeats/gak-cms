@@ -6,6 +6,7 @@ import { columns, Devotion } from "./column";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Loading from "@/components/Loading";
+import { Plus } from "lucide-react";
 
 const Page = () => {
 	const [data, setData] = useState<Devotion[]>([]);
@@ -43,11 +44,14 @@ const Page = () => {
 	}, []); // Empty dependency array means this effect runs once on mount
 
 	return (
-		<div className="p-8 w-full h-screen flex flex-col gap-8">
-			<div className="flex w-full justify-between">
+		<div className="h-full flex flex-col gap-4">
+			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
 				<h1 className="text-2xl font-bold">Devotion</h1>
-				<Button>
-					<Link href="/devotion/create">+ Buat Renungan</Link>
+				<Button asChild className="w-full sm:w-auto">
+					<Link href="/devotion/create" className="flex items-center gap-2">
+						<Plus className="h-4 w-4" />
+						<span>Buat Renungan</span>
+					</Link>
 				</Button>
 			</div>
 
@@ -60,7 +64,9 @@ const Page = () => {
 					{error}
 				</div>
 			) : (
-				<DataTable columns={columns} data={data} />
+				<div className="rounded-md border bg-white">
+					<DataTable columns={columns} data={data} />
+				</div>
 			)}
 		</div>
 	);

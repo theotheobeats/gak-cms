@@ -1,6 +1,5 @@
 "use client";
 
-import Tiptap from "@/components/Tiptap";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
@@ -19,10 +18,18 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { toast } from "react-hot-toast";
+import Link from "next/link";
+import dynamic from "next/dynamic";
+
+// Dynamically import Tiptap with SSR disabled
+const Tiptap = dynamic(() => import("@/components/Tiptap"), {
+	ssr: false,
+	loading: () => <div className="h-[200px] w-full animate-pulse bg-muted rounded-md" />,
+});
 
 export default function CreateDevotion() {
 	const [title, setTitle] = useState("");
@@ -75,11 +82,18 @@ export default function CreateDevotion() {
 	};
 
 	return (
-		<div className="w-full p-8 flex-col space-y-8">
-			<div className="">
-				<h1 className="text-2xl font-bold">Create Devotion</h1>
+		<div className="h-full flex flex-col max-w-3xl mx-auto">
+			{/* Header */}
+			<div className="flex items-center gap-4 mb-8">
+				<Button variant="ghost" size="icon" asChild className="lg:hidden">
+					<Link href="/devotion">
+						<ArrowLeft className="h-4 w-4" />
+					</Link>
+				</Button>
+				<h1 className="text-xl font-bold sm:text-2xl">Create Devotion</h1>
 			</div>
-			<form onSubmit={handleSubmit} className="space-y-4">
+
+			<form onSubmit={handleSubmit} className="flex-1 flex flex-col gap-6">
 				<div className="space-y-2">
 					<label htmlFor="title" className="text-sm font-medium">
 						Title
@@ -92,13 +106,19 @@ export default function CreateDevotion() {
 						required
 					/>
 				</div>
-				<div className="space-y-2">
+
+				<div className="space-y-2 flex-1">
 					<label htmlFor="content" className="text-sm font-medium">
 						Content
 					</label>
-					<Tiptap onChange={setContent} />
+					<div className="min-h-[200px] flex-1">
+						<Suspense fallback={<div className="h-[200px] w-full animate-pulse bg-muted rounded-md" />}>
+							<Tiptap onChange={setContent} content="" />
+						</Suspense>
+					</div>
 				</div>
-				<div className="grid grid-cols-2 gap-4">
+
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<div className="space-y-2">
 						<label className="text-sm font-medium">Status</label>
 						<Select
@@ -117,7 +137,7 @@ export default function CreateDevotion() {
 							</SelectContent>
 						</Select>
 					</div>
-					{/* FIX: Publish Date is not retrieved on backend */}
+
 					<div className="space-y-2">
 						<label className="text-sm font-medium">Publish Date</label>
 						<Popover>
@@ -144,9 +164,24 @@ export default function CreateDevotion() {
 					</div>
 				</div>
 
-				<Button type="submit" className="w-full" disabled={isLoading}>
-					{isLoading ? "Publishing..." : "Publish Devotion"}
-				</Button>
+				<div className="flex flex-col sm:flex-row gap-4 mt-4">
+					<Button 
+						type="button" 
+						variant="outline" 
+						className="w-full sm:w-auto" 
+						onClick={() => router.back()}
+						disabled={isLoading}
+					>
+						Cancel
+					</Button>
+					<Button 
+						type="submit" 
+						className="w-full sm:w-auto flex-1" 
+						disabled={isLoading}
+					>
+						{isLoading ? "Creating..." : "Create Devotion"}
+					</Button>
+				</div>
 			</form>
 		</div>
 	);

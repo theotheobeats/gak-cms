@@ -48,18 +48,6 @@ export const columns: ColumnDef<Devotion>[] = [
 		},
 	},
 	{
-		accessorKey: "createdAt",
-		header: "Created At",
-		cell: ({ row }) => {
-			const date = new Date(row.getValue("createdAt"));
-			return date.toLocaleDateString("en-GB", {
-				day: "2-digit",
-				month: "2-digit",
-				year: "2-digit",
-			});
-		},
-	},
-	{
 		accessorKey: "author.name",
 		header: "Author",
 	},

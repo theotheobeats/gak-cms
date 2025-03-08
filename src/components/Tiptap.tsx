@@ -12,13 +12,14 @@ import Image from "@tiptap/extension-image";
 import TextAlign from "@tiptap/extension-text-align";
 import { Sparkle } from "lucide-react";
 import { Button } from "./ui/button";
+import { useEffect } from 'react';
 
 interface TiptapProps {
-	onChange?: (content: string) => void;
-	initialContent?: string;
+	onChange: (content: string) => void;
+	content?: string;
 }
 
-const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
+const Tiptap = ({ onChange, content = '' }: TiptapProps) => {
 	const editor = useEditor({
 		extensions: [
 			StarterKit.configure({
@@ -45,12 +46,22 @@ const Tiptap = ({ onChange, initialContent = "<p></p>" }: TiptapProps) => {
 				types: ["heading", "paragraph"],
 			}),
 		],
-		content: initialContent,
-		autofocus: true,
-		onUpdate: ({ editor }) => {
-			onChange?.(editor.getHTML());
+		content: content,
+		editorProps: {
+			attributes: {
+				class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[150px] p-4',
+			},
 		},
-	});
+		onUpdate: ({ editor }) => {
+			onChange(editor.getHTML());
+		},
+	}, []);
+
+	useEffect(() => {
+		if (editor && content !== editor.getHTML()) {
+			editor.commands.setContent(content);
+		}
+	}, [content, editor]);
 
 	if (!editor) {
 		return <div>Loading editor...</div>;
