@@ -70,6 +70,10 @@ export default function DocumentationPage() {
 
 	const handlePageChange = (page: number) => {
 		setCurrentPage(page);
+		// Scroll to top on mobile when changing pages
+		if (window.innerWidth < 768) {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
 	};
 
 	const handleDelete = async (id: string) => {
@@ -95,55 +99,51 @@ export default function DocumentationPage() {
 	};
 
 	return (
-		<div className="p-8 w-full min-h-screen">
-			<div className="mx-auto">
-				<div className="flex flex-col gap-8">
-					{/* Title and Upload Button */}
-					<div className="flex items-center justify-between">
-						<div>
-							<h1 className="text-3xl font-bold text-gray-900">
-								Documentation
-							</h1>
-							<p className="text-gray-500 mt-1">
-								Browse and manage your documentation albums
-							</p>
-						</div>
-						<Button asChild className="flex items-center gap-2">
-							<Link href="/documentation/upload">
-								<Upload className="h-4 w-4" />
-								Upload Album
-							</Link>
-						</Button>
-					</div>
+		<div className="h-full flex flex-col">
+			<div className="flex-1 space-y-4 p-4 md:p-8">
+				{/* Header Section */}
+				<div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+					<h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+						Documentation
+					</h1>
+					<Button asChild className="w-full sm:w-auto">
+						<Link href="/documentation/upload" className="flex items-center gap-2">
+							<Upload className="h-4 w-4" />
+							Upload Album
+						</Link>
+					</Button>
+				</div>
 
-					{/* Search Bar */}
-					<div className="relative">
-						<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-						<Input
-							placeholder="Search documentation..."
-							className="pl-10 py-6 bg-white"
-							value={searchQuery}
-							onChange={(e) => {
-								setSearchQuery(e.target.value);
-								setCurrentPage(1);
-							}}
-						/>
-					</div>
+				{/* Search Bar */}
+				<div className="relative">
+					<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+					<Input
+						placeholder="Search documentation..."
+						className="pl-10 py-2 bg-white"
+						value={searchQuery}
+						onChange={(e) => {
+							setSearchQuery(e.target.value);
+							setCurrentPage(1);
+						}}
+					/>
+				</div>
 
+				{/* Content Section */}
+				<div className="space-y-6">
 					{/* Loading State */}
 					{isLoading ? (
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 							{[...Array(6)].map((_, i) => (
 								<div
 									key={i}
-									className="bg-gray-100 rounded-lg h-64 animate-pulse"
+									className="bg-gray-100 rounded-lg h-48 animate-pulse"
 								/>
 							))}
 						</div>
 					) : (
 						<>
 							{/* Albums Grid */}
-							<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 								{paginatedAlbums.map((album) => (
 									<DocumentationCard
 										key={album.id}
@@ -159,14 +159,14 @@ export default function DocumentationPage() {
 
 							{/* Empty State */}
 							{filteredAlbums.length === 0 && (
-								<div className="text-center py-12">
+								<div className="text-center py-8">
 									<p className="text-gray-500">No documentation albums found</p>
 								</div>
 							)}
 
 							{/* Pagination */}
 							{filteredAlbums.length > 0 && (
-								<div className="flex items-center justify-center gap-2 mt-8">
+								<div className="flex items-center justify-center gap-2 py-4">
 									<Button
 										variant="outline"
 										size="icon"
@@ -174,7 +174,7 @@ export default function DocumentationPage() {
 										disabled={currentPage === 1}>
 										<ChevronLeft className="h-4 w-4" />
 									</Button>
-									<div className="flex items-center gap-1">
+									<div className="hidden sm:flex items-center gap-1">
 										{Array.from({ length: totalPages }, (_, i) => i + 1).map(
 											(page) => (
 												<Button
@@ -186,6 +186,11 @@ export default function DocumentationPage() {
 												</Button>
 											)
 										)}
+									</div>
+									<div className="sm:hidden flex items-center gap-2">
+										<span className="text-sm">
+											Page {currentPage} of {totalPages}
+										</span>
 									</div>
 									<Button
 										variant="outline"
