@@ -39,7 +39,7 @@ export default function DocumentationPage() {
 	const fetchAlbums = async () => {
 		try {
 			const response = await fetch(
-				"${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums",
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/albums`,
 				{
 					credentials: "include",
 				}
