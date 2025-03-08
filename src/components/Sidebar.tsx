@@ -2,22 +2,31 @@ import { Book, Camera, LucideDoorClosed } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
+import { toast } from "react-hot-toast";
 
 const Sidebar = () => {
 	const router = useRouter();
+	
 	const logout = async () => {
 		try {
-			await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/sign-out`, {
+			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/sign-out`, {
 				method: "POST",
 				credentials: "include",
-				headers: { "Content-Type": "application/json" },
 			});
+
+			if (!res.ok) {
+				throw new Error(`Failed to sign out: ${res.status}`);
+			}
+
+			router.push("/sign-in");
 		} catch (error) {
-			console.log(error);
-		} finally {
+			console.error("Sign out error:", error);
+			toast.error("Failed to sign out");
+			// Still redirect to sign-in page even if backend fails
 			router.push("/sign-in");
 		}
 	};
+
 	return (
 		<div className="w-[400px] flex flex-col border-r">
 			<div className="p-8 cursor-pointer">
