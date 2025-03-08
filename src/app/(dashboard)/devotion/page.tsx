@@ -44,9 +44,9 @@ const Page = () => {
 	}, []); // Empty dependency array means this effect runs once on mount
 
 	return (
-		<div className="h-full flex flex-col gap-4">
+		<div className="h-full flex flex-col gap-4 p-4 md:p-8">
 			<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
-				<h1 className="text-2xl font-bold">Devotion</h1>
+				<h1 className="text-2xl md:text-3xl font-bold">Devotion</h1>
 				<Button asChild className="w-full sm:w-auto">
 					<Link href="/devotion/create" className="flex items-center gap-2">
 						<Plus className="h-4 w-4" />

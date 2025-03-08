@@ -96,7 +96,7 @@ export function DataTable<TData, TValue>({
 				</Table>
 			</div>
 			
-			<div className="flex items-center justify-between px-2 py-4">
+			<div className="flex items-center justify-between px-2 py-4 border-t">
 				<div className="flex-1 text-sm text-muted-foreground">
 					Page {table.getState().pagination.pageIndex + 1} of{" "}
 					{table.getPageCount()}
