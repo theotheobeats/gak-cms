@@ -1,4 +1,4 @@
-import { Book, Camera, LucideDoorClosed } from "lucide-react";
+import { Book, Camera, LucideDoorClosed, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import React from "react";
@@ -8,13 +8,16 @@ import { cn } from "@/lib/utils";
 const Sidebar = () => {
 	const router = useRouter();
 	const pathname = usePathname();
-	
+
 	const logout = async () => {
 		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/sign-out`, {
-				method: "POST",
-				credentials: "include",
-			});
+			const res = await fetch(
+				`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/sign-out`,
+				{
+					method: "POST",
+					credentials: "include",
+				}
+			);
 
 			if (!res.ok) {
 				throw new Error(`Failed to sign out: ${res.status}`);
@@ -30,13 +33,18 @@ const Sidebar = () => {
 
 	const menuItems = [
 		{
+			href: "/attendance",
+			label: "Absensi Jemaat",
+			icon: UserCheck,
+		},
+		{
 			href: "/devotion",
-			label: "Devotion",
+			label: "Renungan",
 			icon: Book,
 		},
 		{
 			href: "/documentation",
-			label: "Documentation",
+			label: "Dokumentasi",
 			icon: Camera,
 		},
 	];
@@ -48,19 +56,19 @@ const Sidebar = () => {
 					Dashboard
 				</Link>
 			</div>
-			
+
 			<div className="flex-1 px-3">
 				{menuItems.map((item) => {
 					const Icon = item.icon;
 					const isActive = pathname.startsWith(item.href);
-					
+
 					return (
 						<Link key={item.href} href={item.href}>
 							<div
 								className={cn(
 									"flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-colors",
-									isActive 
-										? "bg-slate-100 text-slate-900" 
+									isActive
+										? "bg-slate-100 text-slate-900"
 										: "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
 								)}>
 								<Icon className="h-5 w-5" />
