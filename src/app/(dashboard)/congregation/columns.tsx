@@ -2,7 +2,8 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, History, Trash2 } from "lucide-react";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -93,6 +94,15 @@ export const columns: ColumnDef<Congregation>[] = [
                             table.options.meta?.reloadData();
                         }}
                     />
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        asChild
+                        className="hover:text-primary">
+                        <Link href={`/attendance/${congregation.id}`}>
+                            <History className="h-4 w-4" />
+                        </Link>
+                    </Button>
                     <Button
                         variant="ghost"
                         size="icon"

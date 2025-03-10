@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, History } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import {
@@ -57,8 +57,10 @@ const Page = () => {
 						credentials: "include",
 					}
 				);
-				const sundayResult = (await sundayResponse.json()) as AttendanceResponse;
-				if (!sundayResult.success) throw new Error("Failed to fetch Sunday attendances");
+				const sundayResult =
+					(await sundayResponse.json()) as AttendanceResponse;
+				if (!sundayResult.success)
+					throw new Error("Failed to fetch Sunday attendances");
 				setSundayAttendances(sundayResult.data);
 
 				// Fetch all attendances
@@ -69,7 +71,8 @@ const Page = () => {
 					}
 				);
 				const allResult = (await allResponse.json()) as AttendanceResponse;
-				if (!allResult.success) throw new Error("Failed to fetch all attendances");
+				if (!allResult.success)
+					throw new Error("Failed to fetch all attendances");
 				setAllAttendances(allResult.data);
 			} catch (error) {
 				console.error("Error fetching attendances:", error);
@@ -115,7 +118,11 @@ const Page = () => {
 					<CardHeader>
 						<CardTitle>Kebaktian Umum 1</CardTitle>
 						<CardDescription>
-							{format(new Date(sundayAttendances[0]?.date || new Date()), "EEEE, d MMMM yyyy", { locale: id })}
+							{format(
+								new Date(sundayAttendances[0]?.date || new Date()),
+								"EEEE, d MMMM yyyy",
+								{ locale: id }
+							)}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -129,7 +136,11 @@ const Page = () => {
 					<CardHeader>
 						<CardTitle>Kebaktian Umum 2</CardTitle>
 						<CardDescription>
-							{format(new Date(sundayAttendances[0]?.date || new Date()), "EEEE, d MMMM yyyy", { locale: id })}
+							{format(
+								new Date(sundayAttendances[0]?.date || new Date()),
+								"EEEE, d MMMM yyyy",
+								{ locale: id }
+							)}
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
@@ -155,6 +166,7 @@ const Page = () => {
 									<TableHead>Tanggal</TableHead>
 									<TableHead>Sesi</TableHead>
 									<TableHead>Nama</TableHead>
+									<TableHead className="w-[100px]">Actions</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
@@ -165,6 +177,18 @@ const Page = () => {
 										</TableCell>
 										<TableCell>{attendance.sermonSession.name}</TableCell>
 										<TableCell>{attendance.congregation.name}</TableCell>
+										<TableCell>
+											<Button
+												variant="ghost"
+												size="icon"
+												asChild
+												className="hover:text-primary">
+												<Link
+													href={`/attendance/${attendance.congregation.id}`}>
+													<History className="h-4 w-4" />
+												</Link>
+											</Button>
+										</TableCell>
 									</TableRow>
 								))}
 							</TableBody>
