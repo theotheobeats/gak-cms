@@ -1,9 +1,17 @@
-import { Book, Camera, LucideDoorClosed, UserCheck } from "lucide-react";
+import {
+	Book,
+	Camera,
+	LucideDoorClosed,
+	UserCheck,
+	User2,
+	Home,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import React from "react";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
+import { Badge } from "./ui/badge";
 
 const Sidebar = () => {
 	const router = useRouter();
@@ -33,34 +41,52 @@ const Sidebar = () => {
 
 	const menuItems = [
 		{
+			href: "/",
+			label: "Dashboard",
+			icon: Home,
+			exact: true,
+		},
+		{
 			href: "/attendance",
 			label: "Absensi Jemaat",
 			icon: UserCheck,
+			exact: false,
 		},
 		{
 			href: "/devotion",
 			label: "Renungan",
 			icon: Book,
+			exact: false,
 		},
 		{
 			href: "/documentation",
 			label: "Dokumentasi",
 			icon: Camera,
+			exact: false,
+		},
+		{
+			href: "/congregation",
+			label: "Jemaat",
+			icon: User2,
+			exact: false,
 		},
 	];
 
 	return (
 		<div className="h-full flex flex-col border-r">
-			<div className="p-6">
+			<div className="py-4 px-6 mt-4">
 				<Link href="/" className="text-2xl font-bold">
-					Dashboard
+					Gereja Anugerah Kristus{" "}
+					<Badge className="self-center align-middle">Palembang</Badge>
 				</Link>
 			</div>
-
+			<hr className="mx-4 mb-8 mt-4" />
 			<div className="flex-1 px-3">
 				{menuItems.map((item) => {
 					const Icon = item.icon;
-					const isActive = pathname.startsWith(item.href);
+					const isActive = item.exact
+						? pathname === item.href
+						: pathname.startsWith(item.href) && item.href !== "/";
 
 					return (
 						<Link key={item.href} href={item.href}>

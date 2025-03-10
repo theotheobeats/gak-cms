@@ -173,9 +173,15 @@ export default function CreateAttendance() {
 	};
 
 	// Filter congregations based on search input
-	const filteredCongregations = congregations.filter((congregation) =>
+	const filteredCongregations = congregations
+		.filter((congregation) =>
+			congregation.name.toLowerCase().includes(search.toLowerCase())
+		)
+		.slice(0, 5); // Limit to 5 results
+
+	const totalResults = congregations.filter((congregation) =>
 		congregation.name.toLowerCase().includes(search.toLowerCase())
-	);
+	).length;
 
 	return (
 		<div className="h-full flex flex-col max-w-2xl mx-auto p-4 md:p-8">
@@ -245,40 +251,45 @@ export default function CreateAttendance() {
 												<Loader2 className="h-4 w-4 animate-spin" />
 											</div>
 										) : filteredCongregations.length > 0 ? (
-											filteredCongregations.map((congregation) => (
-												<button
-													key={congregation.id}
-													onClick={() => handleSelectPerson(congregation)}
-													disabled={congregation.hasAttendanceToday}
-													className={cn(
-														"flex w-full items-center gap-2 px-4 py-2 hover:bg-accent text-left text-sm",
-														congregation.hasAttendanceToday &&
-															"opacity-50 cursor-not-allowed"
-													)}>
-													<Check
+											<>
+												{filteredCongregations.map((congregation) => (
+													<button
+														key={congregation.id}
+														onClick={() => handleSelectPerson(congregation)}
+														disabled={congregation.hasAttendanceToday}
 														className={cn(
-															"h-4 w-4",
-															selectedAttendees.some(
-																(a) => a.congregationId === congregation.id
-															)
-																? "opacity-100"
-																: "opacity-0"
+															"flex w-full items-center gap-2 px-4 py-2 hover:bg-accent text-left text-sm",
+															congregation.hasAttendanceToday &&
+																"opacity-50 cursor-not-allowed"
+														)}>
+														<Check
+															className={cn(
+																"h-4 w-4",
+																selectedAttendees.some(
+																	(a) => a.congregationId === congregation.id
+																)
+																	? "opacity-100"
+																	: "opacity-0"
+															)}
+														/>
+														<span className="flex-1">{congregation.name}</span>
+														{congregation.hasAttendanceToday && (
+															<span className="text-xs bg-muted px-1.5 py-0.5 rounded-full">
+																Present today
+															</span>
 														)}
-													/>
-													<span className="flex-1">{congregation.name}</span>
-													{congregation.hasAttendanceToday && (
-														<span className="text-xs bg-muted px-1.5 py-0.5 rounded-full">
-															Present today
-														</span>
-													)}
-												</button>
-											))
+													</button>
+												))}
+												{totalResults > 5 && (
+													<div className="px-4 py-2 text-sm text-muted-foreground text-center border-t">
+														{totalResults - 5} more results available. Keep typing to refine your search.
+													</div>
+												)}
+											</>
 										) : (
 											<div className="p-4 text-center">
 												<p className="text-sm text-muted-foreground mb-4">
-													{search.trim()
-														? "No person found"
-														: "Type to search..."}
+													{search.trim() ? "No person found" : "Type to search..."}
 												</p>
 												{search.trim() && (
 													<Dialog>
@@ -310,9 +321,7 @@ export default function CreateAttendance() {
 																	onClick={handleCreatePerson}
 																	disabled={!newPersonName || isCreatingPerson}
 																	className="w-full">
-																	{isCreatingPerson
-																		? "Adding..."
-																		: "Add Person"}
+																	{isCreatingPerson ? "Adding..." : "Add Person"}
 																</Button>
 															</div>
 														</DialogContent>
@@ -338,11 +347,20 @@ export default function CreateAttendance() {
 					<Button
 						type="submit"
 						className="w-full sm:w-auto flex-1"
-						disabled={isLoading || selectedAttendees.length === 0}
+						disabled={
+							isLoading ||
+							selectedAttendees.length === 0 ||
+							new Date().getDay() !== 0
+						}
 						onClick={(e) => {
 							if (new Date().getHours() < 6) {
 								e.preventDefault();
 								toast.error("Absensi hanya dapat direkam setelah jam 6 pagi");
+								return;
+							}
+							if (new Date().getDay() !== 0) {
+								e.preventDefault();
+								toast.error("Absensi hanya dapat direkam pada hari Minggu");
 								return;
 							}
 						}}>
